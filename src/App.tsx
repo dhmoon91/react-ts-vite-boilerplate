@@ -1,63 +1,54 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ApolloProvider, useQuery } from '@apollo/client';
+import { Route, Routes, BrowserRouter } from 'react-router-dom';
 
-import logo from './logo.svg';
 import './App.css';
 import { client } from './graphql/client';
-import { GET_USERS } from './graphql/user/get_user.query';
+import { GET_PROFILE } from './graphql/profile';
+import { Main } from './pages/Main';
+import { Login } from './pages/Login';
+import { Create } from './pages/Create';
+import { OAuth } from './pages/OAuth';
+import { ProfileContext, ProfileContextType } from './context/profile';
+import { User } from './types/user';
+import { Calendar } from './pages/Calendar';
 
 const App = () => {
-    const [count, setCount] = useState(0);
-
     // Testing
-    const { data } = useQuery(GET_USERS, { client });
-    console.info('data');
-    console.info(data);
+    const [profile, setProfile] = useState<User>();
+    const { loading, data } = useQuery(GET_PROFILE, { client });
+
+    useEffect(() => {
+        if (!loading && data) {
+            const profileData = data.getProfile;
+
+            setProfile(profileData);
+        }
+    }, [loading, data]);
+
+    const ContextValue: ProfileContextType = useMemo(
+        () => ({ profile, setProfile }),
+        [profile, setProfile]
+    );
+
+    if (loading) {
+        return <div>loading...</div>;
+    }
 
     return (
-        <ApolloProvider client={client}>
-            <div className="App">
-                <header className="App-header">
-                    <img src={logo} className="App-logo" alt="logo" />
-                    <p>Hello Vite + React!</p>
-                    <p>
-                        <button
-                            type="button"
-                            onClick={() =>
-                                setCount((countUpdate) => countUpdate + 1)
-                            }
-                        >
-                            count is:
-                            {count}
-                        </button>
-                    </p>
-                    <p>
-                        Edit
-                        <code>App.tsx</code>
-                        and save to test HMR updates.
-                    </p>
-                    <p>
-                        <a
-                            className="App-link"
-                            href="https://reactjs.org"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            Learn React
-                        </a>
-                        {' | '}
-                        <a
-                            className="App-link"
-                            href="https://vitejs.dev/guide/features.html"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            Vite Docs
-                        </a>
-                    </p>
-                </header>
-            </div>
-        </ApolloProvider>
+        <ProfileContext.Provider value={ContextValue}>
+            <ApolloProvider client={client}>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path="/" element={<Main />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/create" element={<Create />} />
+                        <Route path="/oauth" element={<OAuth />} />
+                        <Route path="/calendar" element={<Calendar />} />
+                    </Routes>
+                </BrowserRouter>
+            </ApolloProvider>
+        </ProfileContext.Provider>
     );
 };
 

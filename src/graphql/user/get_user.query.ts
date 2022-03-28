@@ -1,12 +1,11 @@
 import { gql } from '@apollo/client';
 
+import { USER_FRAGMENT } from './user.fragment';
+
 export const GET_USER = gql`
     query GetUser($id: Int!) {
         getUser(id: $id) {
-            id
-            name
-            password
-            username
+          ${USER_FRAGMENT}
         }
     }
 `;
@@ -14,10 +13,7 @@ export const GET_USER = gql`
 export const GET_USERS = gql`
     query {
         getUsers {
-            id
-            name
-            password
-            username
+          ${USER_FRAGMENT}
         }
     }
 `;
