@@ -14,8 +14,6 @@ export const Main: FunctionComponent<MainProps> = ({ className }) => {
     const [count, setCount] = useState(1);
     const { profile } = useContext(ProfileContext);
 
-    console.info(profile);
-
     return (
         <div className="App">
             <header className="App-header">

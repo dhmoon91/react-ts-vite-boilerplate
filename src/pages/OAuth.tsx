@@ -14,7 +14,7 @@ export const OAuth: FunctionComponent<OAuthContentProps> = ({ className }) => {
 
     const { profile } = useContext(ProfileContext);
 
-    if (profile && !profile.isSync) {
+    if (!profile || !profile.isSync) {
         return (
             <div className={className}>
                 <a href={GOOGLE_LOGIN_URL} className="a">
